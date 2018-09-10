@@ -1,141 +1,146 @@
 'use strict';
-
-class _Node {
-  constructor(value, next) {
+class _DllNode {
+  constructor(value, next, prev){
     this.value = value;
     this.next = next;
+    this.prev = prev;
   }
 }
 
-class LinkedList {
-  constructor() {
+class LinkedList{
+  constructor(){
     this.head = null;
   }
-  // insert at the first position
-  insertFirst(item) {
-    this.head = new _Node(item, this.head);
-  }
-  // insert at the last position
-  insertLast(item, next = null) {
-    if (this.head === null) {
-      // if there is no first node, insert it at the first position
-      this.insertFirst(item);
+
+  insertFirst(value){
+    if(this.head === null)
+      this.head = new _DllNode(value, null, null);
+    else{
+      const newNode = new _DllNode(value, this.head, null);
+      this.head = newNode;
     }
-    else {
-      let tempNode = this.head;
-      while(tempNode.next !== null) {
-        // filter through nodes until you find the last one
-        tempNode = tempNode.next;
+  }
+
+  insertLast(value){
+    if(this.head === null)
+      this.head = new _DllNode(value, null, null);
+    else{
+      let curNode = this.head;
+      while(curNode.next !== null){
+        curNode = curNode.next;
       }
-      // create the node after the last node
-      tempNode.next = new _Node(item, next);
-    }
-  }
-  // find a node and place it before
-  insertBefore(item, key) {
-    if(this.head === null) {
-      return;
-    }
-    else {
-      // start at the head
-      let currNode = this.head;
-      // keep track of previous
-      let prevNode = this.head;
-
-      while (currNode && !(key in currNode.value)) {
-        prevNode = currNode;
-        currNode = currNode.next;
-
-        if (currNode && key in currNode.value) {
-          prevNode.next = new _Node(item, currNode);
-        }
-      }
+      curNode.next = new _DllNode(value, null, curNode);
     }
   }
 
-  insertAfter(item, key) {
-    if (this.head === null) {
-      return;
+  remove(value){
+    
+    let curNode = this.head;
+    let prevNode;
+
+    while(curNode !== null && curNode.value !== value ){
+      prevNode = curNode;
+      curNode = curNode.next;
     }
-    else {
-      let currNode = this.head;
-      let prevNode = this.head;
 
-      while (currNode && !(key in currNode.value)) {
-        prevNode = currNode;
-        currNode = currNode.next;
-
-        if (currNode && key in currNode.value) {
-          currNode.next = new _Node(item, currNode.next)
-        }
-      }
-    }
-  }
-
-  insertAt(item, position) {
-    if (position < 0) {
-      throw new Error('Position error');
-    }
-    if (position === 0) {
-      this.insertFirst(item);
-    } else {
-      let node = this._findNthElement(position - 1);
-      const newNode = new _Node(item, null);
-
-      newNode.next = node.next;
-      node.next = newNode;
+    if(curNode === null){
+      console.log('Linked list: Could not find val to delete');
+      return -1;
+    }else{
+      prevNode.next = curNode.next;
+      //TODO: free old node? maybe
+      return 1;
     }
   }
-  
-  find(item) {
-    // start at the head
-    let currNode = this.head;
-    // if it's empty
-    if (!this.head) {
+
+  find(value){
+    let curNode = this.head;
+
+    while(curNode.value !== value && curNode !== null){
+      curNode = curNode.next;
+    }
+
+    if(curNode === null)
       return null;
-    }
-    // check for item value
-    while (currNode.value !== item) {
-      // return null if end of the list
-      // and the item is not on the list
-      if (currNode.next === null) {
-        return null;
-      }
-      else {
-        // keep looking
-        currNode = currNode.next;
-      }
-    }
-    // found it
-    return currNode;
+    else
+      return curNode;
   }
 
-  remove(item) {
-    // if the list is emoty
-    if (!this.head) {
-      return null;
-    }
-    // if the node to be removed is head, make the next node head
-    if (item in this.head.value) {
-      this.head = this.head.next;
-      return;
-    }
-    // start at the head
-    let currNode = this.head;
-    // keep track of previous
-    let prevNode = this.head;
+  insertBefore(newVal,targetVal){
+    let curNode = this.head;
+    let prevNode;
 
-    while(currNode && !(item in currNode.value)) {
-      // save the previous node
-      prevNode = currNode;
-      currNode = currNode.next;
+    while(curNode !== null && curNode.value !== targetVal ){
+      prevNode = curNode;
+      curNode = curNode.next;
     }
-    if (currNode === null) {
-      console.log('Item not found');
-      return;
+
+    if(curNode === null){
+      console.log('Linked list: Could not find val to insert before');
+      return -1;
+    }else if (curNode === this.head){
+      let newNode = new _DllNode(newVal, curNode, null);
+
+      this.head = newNode;
     }
-    prevNode.next = currNode.next;
+    
+    else{
+      let newNode = new _DllNode(newVal, curNode, prevNode);
+      prevNode.next = newNode;
+      //TODO: free old node? maybe
+      return 1;
+    }
   }
+  insertAfter(newVal,targetVal){
+    let curNode = this.head;
+    let nextNode;
+
+    while(curNode !== null && curNode.value !== targetVal ){
+      curNode = curNode.next;
+      nextNode = curNode.next;
+
+    }
+
+    if(curNode === null){
+      console.log('Linked list: Could not find val to insert after');
+      return -1;
+    }else{
+      let newNode = new _DllNode(newVal, curNode.next, curNode.prev);
+      curNode.next = newNode;
+      //TODO: free old node? maybe
+      return 1;
+    }
+  }
+  insertAt(newVal,targetPos){
+    let curNode = this.head, counter =0;
+    let prevNode = curNode.prev;
+
+    
+    while(curNode !== null &&  counter !== targetPos){
+      prevNode = curNode;
+      curNode = curNode.next;
+      counter++;
+    }
+
+    if(curNode === null){
+      console.log('Linked list: Could not find position to insert at');
+      return -1;
+    }else if (targetPos ===0){
+      let newNode = new _DllNode(newVal, curNode, curNode.prev);
+
+      this.head = newNode;
+    }
+    
+    else{
+      let newNode = new _DllNode(newVal, curNode.next, curNode.prev);
+      
+
+      prevNode.next = newNode;
+      //TODO: free old node? maybe
+      return 1;
+    }
+  }
+
 }
 
 module.exports = LinkedList;

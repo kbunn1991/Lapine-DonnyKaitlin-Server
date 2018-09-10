@@ -60,6 +60,7 @@ function loadDummyData(array){
   for(let i = 0; i < array.length; i++){
     linkedList.insertFirst(array[i]);
 
+  
   }
 }
 
@@ -67,20 +68,30 @@ function loadDummyData(array){
 loadDummyData(questions);
 
 let curNode = linkedList.head;
-router.get('/',(req,res,next) =>{
+let prevNode= null;
 
-  res.json(curNode.value);
+
+router.get('/',(req,res,next) =>{
+  console.log('GET WORKS');
+  console.log('current NODE',curNode);
+  let nodes ={
+    current: curNode.value,
+    previous: prevNode ? prevNode.value : {lapine:'',english:''}
+  };
+  res.json(nodes);
 
 
 });
 
 router.post('/',(req,res,next) =>{
-  console.log('user answer req body',req.body);
+//   console.log('user answer req body',req);
   // let {answer} = req.body;
-
+  console.log('next node?');
   // if(answer === curNode.value.english){
-    curNode=curNode.next;
-    console.log('next node?',curNode);
+  prevNode=curNode;
+  console.log('prevnode',prevNode);
+  curNode=curNode.next;
+    
   // }
 
   res.json(curNode);
