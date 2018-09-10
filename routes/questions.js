@@ -66,15 +66,27 @@ function loadDummyData(array){
 
 loadDummyData(questions);
 
-
+let curNode = linkedList.head;
 router.get('/',(req,res,next) =>{
 
-  res.json(linkedList);
+  res.json(curNode);
 
 
 });
 
-// router.post('/')
+router.post('/',(req,res,next) =>{
+  console.log('user answer req body',req.body);
+  let {answer} = req.body;
+
+  if(answer === curNode.value.english){
+    curNode=curNode.next;
+    console.log('next node?',curNode);
+  }
+
+  res.json(curNode);
+
+
+});
 
 
 module.exports = router;
