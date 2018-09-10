@@ -4,20 +4,10 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
+const LinkedList = require('../linked-list-class');
 
 // Protect endpoints using JWT Strategy
-router.use(passport.authenticate('jwt', { session: false, failWithError: true }));
-//dummy data
-// Acorn - maythennion
-// Dandelion - dahloi
-// Snow - yera
-// Strawberry -  syriénnion
-// Sun- firth
-// Sleep = zyz
-// Plant - efath
-// Motor Car - hrududu
-// Mountain - bryhl nos
-// Cloud - hral
+// router.use(passport.authenticate('jwt', { session: false, failWithError: true }));
 
 
 const questions = [
@@ -64,13 +54,27 @@ const questions = [
 ];
 
 
+const linkedList = new LinkedList();
+
+function loadDummyData(array){
+  for(let i = 0; i < array.length; i++){
+    linkedList.insertFirst(array[i]);
+
+  }
+}
+
+
+loadDummyData(questions);
 
 
 router.get('/',(req,res,next) =>{
 
-
+  res.json(linkedList);
 
 
 });
 
 // router.post('/')
+
+
+module.exports = router;
