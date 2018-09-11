@@ -3,6 +3,7 @@
 const express = require('express');
 
 const User = require('../models/user');
+const Question = require('../models/question');
 
 const router = express.Router();
 
@@ -80,13 +81,33 @@ router.post('/', (req, res, next) => {
   // Username and password were validated as pre-trimmed
   let { username, password, fullname = '' } = req.body;
   fullname = fullname.trim();
+  let newQuestions;
+  let nextIndex = null;
 
+  Question.find()
+    .then(questions =>  newQuestions = questions.map(question => question._id))
+    .then(() =>{
+      for(let i=0; i< newQuestions.length; i++){
+        if(i === newQuestions.length-1){
+          newQuestions[i].next = null;
+        } else {
+          newQuestions[i].next = i+1;
+        }
+        
+      }
+      
+    }); 
+    
+  
+  
   return User.hashPassword(password)
     .then(digest => {
       const newUser = {
         username,
         password: digest,
-        fullname
+        questions: newQuestions,
+        head:0
+       
       };
       return User.create(newUser);
     })

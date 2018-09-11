@@ -14,7 +14,7 @@ const questions = [
   {
     lapine: 'maythennion',
     english: 'acorn',
-
+    counter:0
     
   },
   {
@@ -78,9 +78,9 @@ router.get('/',(req,res,next) =>{
   console.log('current NODE',curNode);
 
   if(curNode.next === null){
-    curNode = linkedList.head;
+    curNode.next = linkedList.head;
   }
-  
+
   let nodes ={
     current: curNode.value,
     previous: prevNode ? prevNode.value : {lapine:'',english:''}

@@ -6,7 +6,20 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  words:{type:Object,default:null}
+  questions:[
+    {
+      question: {type:mongoose.Schema.Types.ObjectId, ref:'Question'},
+      mValue:{type:Number,default:1},
+      next:{type:Number},
+      correctAnswers:{type:Number,default:0},
+      attempts:{type:Number,default:0}
+    }
+  ],
+  head:{type:Number}
+  
+  //should be array of objects
+  //mimic the linked list in the array
+  //use array as linked list
 });
 
 userSchema.set('toObject', {
@@ -24,6 +37,6 @@ userSchema.methods.validatePassword = function (password) {
 
 userSchema.statics.hashPassword = function (password) {
   return bcrypt.hash(password, 10);
-}
+};
 
 module.exports = mongoose.model('User', userSchema);
