@@ -85,7 +85,7 @@ router.post('/', (req, res, next) => {
   let nextIndex = null;
 
   Question.find()
-    .then(questions =>  newQuestions = questions.map(question => question._id))
+    .then(questions =>  newQuestions = questions.map(question => ({question: question._id})))
     .then(() =>{
       for(let i=0; i< newQuestions.length; i++){
         if(i === newQuestions.length-1){
@@ -93,14 +93,10 @@ router.post('/', (req, res, next) => {
         } else {
           newQuestions[i].next = i+1;
         }
-        
       }
-      
-    }); 
-    
-  
-  
-  return User.hashPassword(password)
+      // console.log('NEWQUESTIONS',newQuestions);
+      return User.hashPassword(password);
+    })
     .then(digest => {
       const newUser = {
         username,

@@ -5,9 +5,10 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const LinkedList = require('../linked-list-class');
+const User = require('../models/user');
 
 // Protect endpoints using JWT Strategy
-// router.use(passport.authenticate('jwt', { session: false, failWithError: true }));
+router.use(passport.authenticate('jwt', { session: false, failWithError: true }));
 
 
 const questions = [
@@ -74,21 +75,36 @@ let prevNode= null;
 
 
 router.get('/',(req,res,next) =>{
+ 
+
+  console.log('REQ USER', req.user.id);
   console.log('GET WORKS');
-  console.log('current NODE',curNode);
+  // console.log('current NODE',curNode);
 
-  if(curNode.next === null){
-    curNode.next = linkedList.head;
-  }
+  const userId = req.user.id;
+    User.findById(userId)
+    .populate('questions.question')
+    .then(user => res.json(user.questions[0]));
+      
+  
 
-  let nodes ={
-    current: curNode.value,
-    previous: prevNode ? prevNode.value : {lapine:'',english:''}
-  };
+    // testUser.populate('questions');
+
+    // console.log('USER QUESTIONS',testUser.username);
+
+
+  // if(curNode.next === null){
+  //   curNode.next = linkedList.head;
+  // }
+
+  // let nodes ={
+  //   current: curNode.value,
+  //   previous: prevNode ? prevNode.value : {lapine:'',english:''}
+  // };
 
 
 
-  res.json(nodes);
+  // res.json(nodes);
 
 });
 
