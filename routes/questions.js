@@ -14,62 +14,72 @@ const questions = [
   {
     lapine: 'maythennion',
     english: 'acorn',
-
-    
+    next: 1
   },
   {
     lapine:'dahloi',
-    english:'dandelion'
+    english:'dandelion',
+    next: 2
   },
   {
     lapine:'yera',
-    english:'snow'
+    english:'snow',
+    next: 3
   },
   {
     lapine:'syriénnion',
-    english:'strawberry'
+    english:'strawberry',
+    next: 4
   },
   {
     lapine:'firth',
-    english:'sun'
+    english:'sun',
+    next: 5
   },
   {
     lapine:'zyz',
-    english:'sun'
+    english:'sun',
+    next: 6
   },
   {
     lapine:'efath',
-    english:'plant'
+    english:'plant',
+    next: 7
   },
   {
     lapine:'hral',
-    english:'cloud'
+    english:'cloud',
+    next: 8
   },
   {
     lapine:'hrdudu',
-    english:'mountain'
+    english:'mountain',
+    next: 9
   },
   {
     lapine:'bryl nos',
-    english:'car'
+    english:'car',
+    next: null
   }
 ];
 
 
-const linkedList = new LinkedList();
+// const linkedList = new LinkedList();
 
-function loadDummyData(array){
-  for(let i = 0; i < array.length; i++){
-    linkedList.insertFirst(array[i]);
+// function loadDummyData(array){
+//   for(let i = 0; i < array.length; i++){
+//     linkedList.insertFirst(array[i]);
 
   
-  }
-}
+//   }
+// }
 
 
-loadDummyData(questions);
+// loadDummyData(questions);
 
-let curNode = linkedList.head;
+// let curNode = linkedList.head;
+
+let curNode = questions[0];
 let prevNode= null;
 
 
@@ -78,33 +88,31 @@ router.get('/',(req,res,next) =>{
   console.log('current NODE',curNode);
 
   if(curNode.next === null){
-    curNode = linkedList.head;
+    // curNode.next = linkedList.head;
+    curNode.next = 0;
   }
   
   let nodes ={
-    current: curNode.value,
-    previous: prevNode ? prevNode.value : {lapine:'',english:''}
+    current: curNode,
+    previous: prevNode ? prevNode : {lapine:'',english:''}
   };
-
-
 
   res.json(nodes);
 
 });
 
 router.post('/',(req,res,next) =>{
- console.log('user answer req body',req.body);
-  // let {answer} = req.body;
-  console.log('next node?');
+//  console.log('user answer req body',req.body);
+  let {guess} = req.body;
+  console.log(guess);
+  console.log('currentNode', curNode);
+  curNode = questions[curNode.next];
+  console.log('currentNodeNew', curNode);
+
   // if(answer === curNode.value.english){
-  prevNode=curNode;
-  console.log('prevnode',prevNode);
-  curNode=curNode.next;
-    
   // }
 
   res.json(curNode);
-
 
 });
 
