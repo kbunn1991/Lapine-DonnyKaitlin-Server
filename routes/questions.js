@@ -13,7 +13,9 @@ const LinkedList = require('../linked-list-class');
 const questions = [
   {
     lapine: 'maythennion',
-    english: 'acorn'
+    english: 'acorn',
+
+    
   },
   {
     lapine:'dahloi',
@@ -74,17 +76,24 @@ let prevNode= null;
 router.get('/',(req,res,next) =>{
   console.log('GET WORKS');
   console.log('current NODE',curNode);
+
+  if(curNode.next === null){
+    curNode = linkedList.head;
+  }
+  
   let nodes ={
     current: curNode.value,
     previous: prevNode ? prevNode.value : {lapine:'',english:''}
   };
-  res.json(nodes);
 
+
+
+  res.json(nodes);
 
 });
 
 router.post('/',(req,res,next) =>{
-//   console.log('user answer req body',req);
+ console.log('user answer req body',req.body);
   // let {answer} = req.body;
   console.log('next node?');
   // if(answer === curNode.value.english){

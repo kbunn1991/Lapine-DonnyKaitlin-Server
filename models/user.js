@@ -5,8 +5,9 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
-})
+  password: { type: String, required: true },
+  words:{type:Object,default:null}
+});
 
 userSchema.set('toObject', {
   virtuals: true, // built in virtual id
@@ -15,11 +16,11 @@ userSchema.set('toObject', {
     delete ret._id, // delete '_id'
     delete ret.password;
   }
-})
+});
 
 userSchema.methods.validatePassword = function (password) {
   return bcrypt.compare(password, this.password);
-}
+};
 
 userSchema.statics.hashPassword = function (password) {
   return bcrypt.hash(password, 10);
