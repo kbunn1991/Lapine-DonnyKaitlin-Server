@@ -84,7 +84,7 @@ router.get('/',(req,res,next) =>{
   const userId = req.user.id;
     User.findById(userId)
     .populate('questions.question')
-    .then(user => res.json(user.questions[0]));
+    .then(user => res.json(user.questions[user.head]));
       
   
 
