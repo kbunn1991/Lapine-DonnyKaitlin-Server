@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
-const LinkedList = require('../linked-list-class');
+
 const User = require('../models/user');
 
 // Protect endpoints using JWT Strategy
@@ -185,7 +185,7 @@ router.post('/',(req,res,next) =>{
 
       // Compare our user input (guess) with our correct answer
       // console.log('answer',answer,'guess',guess); 
-      if(answer === guess.toLowerCase()){
+      if(answer === guess.replace(/\s+/g, '').toLowerCase()){
         correctGuess = true;
         user.questions[currIndex].correctAnswers +=1;
         user.questions[currIndex].mValue *= 2;
