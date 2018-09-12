@@ -92,7 +92,7 @@ router.get('/attempts',(req,res,next) =>{
     .populate('questions.question')
     .then(user =>{
 
-      console.log('CurrentHead',user);
+      console.log('CurrentUser',user);
       res.json(user.questions[user.head].attempts);
 
 
@@ -117,7 +117,7 @@ router.get('/correct',(req,res,next) =>{
     .populate('questions.question')
     .then(user =>{
 
-      console.log('CurrentHead',user);
+      console.log('CurrentUser',user);
       res.json(user.questions[user.head].correctAnswers);
 
 
@@ -153,7 +153,7 @@ router.post('/',(req,res,next) =>{
 
       // Compare our user input (guess) with our correct answer
       // console.log('answer',answer,'guess',guess); 
-      if(answer === guess){
+      if(answer === guess.toLowerCase()){
         correctGuess = true;
         user.questions[currIndex].correctAnswers +=1;
         user.questions[currIndex].mValue *= 2;
@@ -171,7 +171,6 @@ router.post('/',(req,res,next) =>{
       } else {
         user.head = question.next;
       }
-
 
       //Move the question back based on the mValue calculated above
       //temp variable that stores a copy of our current node and a counter
@@ -202,9 +201,19 @@ router.post('/',(req,res,next) =>{
           next(err);
         }
         if(!correctGuess){
-          res.json(user.questions[currIndex].question.englishWord);
+          let tempObj={
+            answer,
+            attempts : user.questions[currIndex].attempts,
+            correctCount:  user.questions[currIndex].correctAnswers
+          };
+          res.json(tempObj);
         } else {
-          res.json('');
+          let tempObj={
+            answer:'',
+            attempts : user.questions[currIndex].attempts,
+            correctCount:  user.questions[currIndex].correctAnswers
+          };
+          res.json(tempObj);
         }
 
       });
