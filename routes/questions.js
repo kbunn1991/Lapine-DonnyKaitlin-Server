@@ -97,6 +97,55 @@ router.get('/',(req,res,next) =>{
       
 });
 
+router.get('/attempts',(req,res,next) =>{
+ 
+
+  console.log('REQ USER', req.user.id);
+  console.log('GET WORKS');
+  // console.log('current NODE',curNode);
+
+  const userId = req.user.id;
+  User.findById(userId)
+    .populate('questions.question')
+    .then(user =>{
+
+      console.log('CurrentHead',user);
+      res.json(user.questions[user.head].attempts);
+
+
+    })
+    .catch(err => {
+      next(err);
+    });
+      
+});
+
+// get the number of correct answers
+
+router.get('/correct',(req,res,next) =>{
+ 
+
+  console.log('REQ USER', req.user.id);
+  console.log('GET WORKS');
+  // console.log('current NODE',curNode);
+
+  const userId = req.user.id;
+  User.findById(userId)
+    .populate('questions.question')
+    .then(user =>{
+
+      console.log('CurrentHead',user);
+      res.json(user.questions[user.head].correctAnswers);
+
+
+    })
+    .catch(err => {
+      next(err);
+    });
+      
+});
+
+
 router.post('/',(req,res,next) =>{
   console.log('user answer req body',req.body);
  
@@ -111,24 +160,27 @@ router.post('/',(req,res,next) =>{
      
       let currIndex = user.head;
       let correctCount = user.questions[currIndex].correctAnswers;
-      let correctAnswer = user.questions[currIndex].question.englishWord;
+      let answer = user.questions[currIndex].question.englishWord;
 
       //increment attempt counter
       user.questions[currIndex].attempts += 1;
 
       console.log('correct count',correctCount);
-      let correctGuess;
+      let correctGuess = true;
       console.log('answer',answer,'guess',guess); 
      
       if(answer === guess){
         console.log('CORRECT ANSWER');
         correctGuess = true;
         user.questions[currIndex].correctAnswers +=1;
+        console.log(correctGuess);
 
       }
       else{
         console.log('Wrong ANSWER');
         correctGuess = false;
+        console.log(correctGuess);
+        // res.json(user.questions[currIndex].question.englishWord);
         
       }
       let nextNode = user.questions[currIndex].next;
@@ -141,7 +193,7 @@ router.post('/',(req,res,next) =>{
         if(!correctGuess){
           res.json(user.questions[currIndex].question.englishWord);
         } else {
-          res.status(200);
+          res.json('');
         }
 
       });
