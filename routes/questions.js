@@ -58,8 +58,6 @@ router.use(passport.authenticate('jwt', { session: false, failWithError: true })
 
 
 router.get('/',(req,res,next) =>{
- 
-
   console.log('REQ USER', req.user.id);
   console.log('GET WORKS');
   // console.log('current NODE',curNode);
@@ -77,14 +75,11 @@ router.get('/',(req,res,next) =>{
     .catch(err => {
       next(err);
     });
-      
 });
 
 router.get('/attempts',(req,res,next) =>{
  
-
-  console.log('REQ USER', req.user.id);
-  console.log('GET WORKS');
+  console.log('GET ATTEMPTS WORKS');
   // console.log('current NODE',curNode);
 
   const userId = req.user.id;
@@ -109,7 +104,7 @@ router.get('/correct',(req,res,next) =>{
  
 
   console.log('REQ USER', req.user.id);
-  console.log('GET WORKS');
+  console.log('GET CORRECT WORKS');
   // console.log('current NODE',curNode);
 
   const userId = req.user.id;
@@ -130,7 +125,7 @@ router.get('/all',(req,res,next) =>{
  
 
   console.log('REQ USER', req.user.id);
-  console.log('GET WORKS');
+  console.log('GET ALL WORKS');
   // console.log('current NODE',curNode);
 
   const userId = req.user.id;
@@ -143,6 +138,26 @@ router.get('/all',(req,res,next) =>{
     .catch(err => {
       next(err);
     });  
+});
+
+router.get('/hint',(req,res,next) =>{
+  console.log('REQ USER', req.user.id);
+  console.log('GET HINT WORKS');
+  // console.log('current NODE',curNode);
+
+  const userId = req.user.id;
+  User.findById(userId)
+    .populate('questions.question')
+    .then(user =>{
+     
+
+      res.json(user.questions[user.head].question.englishWord[0]);
+
+
+    })
+    .catch(err => {
+      next(err);
+    });
 });
 
 
