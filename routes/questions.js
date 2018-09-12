@@ -116,16 +116,33 @@ router.get('/correct',(req,res,next) =>{
   User.findById(userId)
     .populate('questions.question')
     .then(user =>{
-
       console.log('CurrentUser',user);
       res.json(user.questions[user.head].correctAnswers);
-
-
     })
     .catch(err => {
       next(err);
-    });
-      
+    });  
+});
+
+// get ALL questions
+
+router.get('/all',(req,res,next) =>{
+ 
+
+  console.log('REQ USER', req.user.id);
+  console.log('GET WORKS');
+  // console.log('current NODE',curNode);
+
+  const userId = req.user.id;
+  User.findById(userId)
+    .populate('questions.question')
+    .then(user =>{
+      console.log('CurrentUser',user);
+      res.json(user.questions);
+    })
+    .catch(err => {
+      next(err);
+    });  
 });
 
 
