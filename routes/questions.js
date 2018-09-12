@@ -57,23 +57,6 @@ router.use(passport.authenticate('jwt', { session: false, failWithError: true })
 // ];
 
 
-// const linkedList = new LinkedList();
-
-// function loadDummyData(array){
-//   for(let i = 0; i < array.length; i++){
-//     linkedList.insertFirst(array[i]);
-
-  
-//   }
-// }
-
-
-// loadDummyData(questions);
-
-// let curNode = linkedList.head;
-// let prevNode= null;
-
-
 router.get('/',(req,res,next) =>{
  
 
@@ -85,8 +68,8 @@ router.get('/',(req,res,next) =>{
   User.findById(userId)
     .populate('questions.question')
     .then(user =>{
+     
 
-      console.log('CurrentHead',user);
       res.json(user.questions[user.head].question.lapineWord);
 
 
@@ -109,7 +92,7 @@ router.get('/attempts',(req,res,next) =>{
     .populate('questions.question')
     .then(user =>{
 
-      console.log('CurrentHead',user);
+      console.log('CurrentUser',user);
       res.json(user.questions[user.head].attempts);
 
 
@@ -134,7 +117,7 @@ router.get('/correct',(req,res,next) =>{
     .populate('questions.question')
     .then(user =>{
 
-      console.log('CurrentHead',user);
+      console.log('CurrentUser',user);
       res.json(user.questions[user.head].correctAnswers);
 
 
@@ -151,49 +134,86 @@ router.post('/',(req,res,next) =>{
  
   const {guess} = req.body;
   const userId = req.user.id;
-  let answer = null;
 
   User.findById(userId)
     .populate('questions.question')
     .then(user => {
       console.log('REQ USER ID POST',userId); 
-     
+       
+      //Local variables having to do with the position
       let currIndex = user.head;
-      let correctCount = user.questions[currIndex].correctAnswers;
-      let answer = user.questions[currIndex].question.englishWord;
+      let question = user.questions[currIndex];
 
-      //increment attempt counter
+      //Local variables having to do with the accuracy tracking
+      let answer = user.questions[currIndex].question.englishWord;
+      let correctGuess = true;
+
+      //Increment attempt counter
       user.questions[currIndex].attempts += 1;
 
-      console.log('correct count',correctCount);
-      let correctGuess = true;
-      console.log('answer',answer,'guess',guess); 
-     
-      if(answer === guess){
-        console.log('CORRECT ANSWER');
+      // Compare our user input (guess) with our correct answer
+      // console.log('answer',answer,'guess',guess); 
+      if(answer === guess.toLowerCase()){
         correctGuess = true;
         user.questions[currIndex].correctAnswers +=1;
-        console.log(correctGuess);
-
+        user.questions[currIndex].mValue *= 2;
       }
       else{
-        console.log('Wrong ANSWER');
         correctGuess = false;
-        console.log(correctGuess);
-        // res.json(user.questions[currIndex].question.englishWord);
-        
+        user.questions[currIndex].mValue = 1;
       }
-      let nextNode = user.questions[currIndex].next;
-      user.head = nextNode;
+
+      //Set head to the value of next pointer (unless it's the end)
+      //This is what changes the word being displayed -
+      //every time you send a post request, the head is set to the next item
+      if (user.head === null) {
+        user.head = 0;
+      } else {
+        user.head = question.next;
+      }
+
+      //Move the question back based on the mValue calculated above
+      //temp variable that stores a copy of our current node and a counter
+      let currNode = question;
+      let counter = 0;
+
+      //Loop until we reach our mValue (our new position)
+      //Each iteration, move to the next node 
+      while(counter !== question.mValue){
+        (currNode !== null) ?
+          currNode = user.questions[currNode.next] : 
+          currNode = user.questions[user.head];
+        counter++;
+      }
+      
+      //When the new position is reached, 
+      //set the current nodes's next pointer value to the temporary node's next value
+      //And the temporary next pointer's value to the original node's head
+      //this effectively inserts the original node at a new position M spaces away from where it was originally
     
-      user.save(function (err, updatedUser) {
+      question.next = currNode.next;
+      currNode.next = currIndex;
+     
+      //below function is a mongoose method to update our DB with the modified properties 
+      //and send a response back to the client
+      user.save(function (err) {
         if (err) {
           next(err);
         }
         if(!correctGuess){
-          res.json(user.questions[currIndex].question.englishWord);
+          let tempObj={
+            answer,
+            attempts : user.questions[currIndex].attempts,
+            correctCount:  user.questions[currIndex].correctAnswers
+          };
+          res.json(tempObj);
         } else {
-          res.json('');
+          let tempObj={
+            answer:'',
+            attempts : user.questions[currIndex].attempts,
+            correctCount:  user.questions[currIndex].correctAnswers
+          };
+          res.json(tempObj);
         }
 
       });
@@ -202,7 +222,11 @@ router.post('/',(req,res,next) =>{
     });
 
 
+
+
 });
+
+
 
 
 module.exports = router;
