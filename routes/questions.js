@@ -19,11 +19,25 @@ router.get('/',(req,res,next) =>{
   User.findById(userId)
     .populate('questions.question')
     .then(user =>{
-     
-
       res.json(user.questions[user.head].question.lapineWord);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
 
 
+
+router.get('/image',(req,res,next) =>{
+  console.log('REQ USER', req.user.id);
+  console.log('GET IMAGE WORKS');
+  // console.log('current NODE',curNode);
+
+  const userId = req.user.id;
+  User.findById(userId)
+    .populate('questions.question')
+    .then(user =>{
+      res.json(user.questions[user.head].question.imageURL);
     })
     .catch(err => {
       next(err);
@@ -165,6 +179,10 @@ router.post('/',(req,res,next) =>{
       //Loop until we reach our mValue (our new position)
       //Each iteration, move to the next node 
       while(counter !== question.mValue){
+        if (currNode.mValue > user.questions.length) {
+          currNode.mValue = user.questions.length - 1;
+       
+        }
         (currNode !== null) ?
           currNode = user.questions[currNode.next] : 
           currNode = user.questions[user.head];
@@ -189,14 +207,17 @@ router.post('/',(req,res,next) =>{
           let tempObj={
             answer,
             attempts : user.questions[currIndex].attempts,
-            correctCount:  user.questions[currIndex].correctAnswers
+            correctCount:  user.questions[currIndex].correctAnswers,
+            // imageURL:''
+           
           };
           res.json(tempObj);
         } else {
           let tempObj={
             answer:'',
             attempts : user.questions[currIndex].attempts,
-            correctCount:  user.questions[currIndex].correctAnswers
+            correctCount:  user.questions[currIndex].correctAnswers,
+            // imageURL: user.questions[question.next].question.imageURL
           };
           res.json(tempObj);
         }

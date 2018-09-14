@@ -96,10 +96,6 @@ router.post('/', (req, res, next) => {
           location: 'username'
         });
       }
-    
-      return User.hashPassword(password);
-    })
-    .then(digest => {
       Question.find()
         .then(questions =>  newQuestions = questions.map(question => ({question: question._id})))
         .then(() =>{
@@ -110,9 +106,14 @@ router.post('/', (req, res, next) => {
               newQuestions[i].next = i+1;
             }
           }
-        // console.log('NEWQUESTIONS',newQuestions);
-      
+          // console.log('NEWQUESTIONS',newQuestions);
+    
         });
+    
+      return User.hashPassword(password);
+    })
+    .then(digest => {
+     
       const newUser = {
         username,
         password: digest,
