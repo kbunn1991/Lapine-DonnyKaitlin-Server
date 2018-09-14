@@ -3,16 +3,16 @@
 const Question = require('../models/question');
 const mongoose = require('mongoose');
 
-const { TEST_DATABASE_URL } = require('../config');
+const { DATABASE_URL } = require('../config');
 const seedWords = require('./questions.json');
 
 let newQuestions = null;
 
-console.log(`Connecting to mongodb at ${TEST_DATABASE_URL}`);
-mongoose.connect(TEST_DATABASE_URL)
+console.log(`Connecting to mongodb at ${DATABASE_URL}`);
+mongoose.connect(DATABASE_URL)
   .then(() => {
     console.info('Dropping Database');
-    // return mongoose.connection.db.dropDatabase();
+    return mongoose.connection.db.dropDatabase();
   })
   .then(() => {
     console.info('Seeding Database');
