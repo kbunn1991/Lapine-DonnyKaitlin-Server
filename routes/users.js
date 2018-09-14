@@ -7,7 +7,7 @@ const Question = require('../models/question');
 
 const router = express.Router();
 
-/* ========== POST/CREATE AN ITEM ========== */
+/* ========== POST/CREATE A NEW USER ========== */
 router.post('/', (req, res, next) => {
 
   const requiredFields = ['username', 'password'];
@@ -79,25 +79,40 @@ router.post('/', (req, res, next) => {
   }
 
   // Username and password were validated as pre-trimmed
-  let { username, password, fullname = '' } = req.body;
-  fullname = fullname.trim();
+  let { username, password = '' } = req.body;
+  // fullname = fullname.trim();
   let newQuestions;
   let nextIndex = null;
 
-  Question.find()
-    .then(questions =>  newQuestions = questions.map(question => ({question: question._id})))
-    .then(() =>{
-      for(let i=0; i< newQuestions.length; i++){
-        if(i === newQuestions.length-1){
-          newQuestions[i].next = null;
-        } else {
-          newQuestions[i].next = i+1;
-        }
+  User.find({username})
+    .count()
+    .then((result)=>{
+      // console.log('FOUND USER',result);
+      if(result !== 0) {
+        return Promise.reject({
+          code: 422,
+          reason: 'ValidationError',
+          message: 'Username already taken',
+          location: 'username'
+        });
       }
-      // console.log('NEWQUESTIONS',newQuestions);
+    
       return User.hashPassword(password);
     })
     .then(digest => {
+      Question.find()
+        .then(questions =>  newQuestions = questions.map(question => ({question: question._id})))
+        .then(() =>{
+          for(let i=0; i< newQuestions.length; i++){
+            if(i === newQuestions.length-1){
+              newQuestions[i].next = null;
+            } else {
+              newQuestions[i].next = i+1;
+            }
+          }
+        // console.log('NEWQUESTIONS',newQuestions);
+      
+        });
       const newUser = {
         username,
         password: digest,
@@ -111,9 +126,11 @@ router.post('/', (req, res, next) => {
       return res.status(201).location(`/api/users/${result.id}`).json(result);
     })
     .catch(err => {
-      if (err.code === 11000) {
-        err = new Error('The username already exists');
-        err.status = 400;
+      console.log('ERR CATCH CHECK',err);
+      if(err.reason === 'ValidationError'){
+        // const newErr = new Error('Username already exists');
+        // newErr.status = 422;
+        return res.status(err.code).json(err);
       }
       next(err);
     });
