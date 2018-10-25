@@ -90,4 +90,28 @@ A detailed and commented walk-through of implemented code is found below:
       question.next = currNode.next;
       currNode.next = currIndex;
 ```
+## API Documentation
+
+### GET current question
+
+* Request Type: `GET`
+
+* URL: `https://bunneh-server.herokuapp.com/questions`
+
+* Requires a userId as req.user.id in request body
+
+* Response is the lapine vocabulary word of our current question
+
+
+### POST an answer
+
+
+* Request Type: `POST`
+
+* URL: `https://bunneh-server.herokuapp.com/questions`
+
+* Requires a user id as req.user.id and a "guess" (user input) as part of the request body (req.body.guess)
+
+* Response is the answer, the number of attempts, and the number of correct guesses for that particular word
+
 
